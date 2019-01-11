@@ -1,12 +1,12 @@
 <?php
-namespace App\Test\TestCase\Controller\Component;
+namespace Skeleton\Test\TestCase\Controller\Component;
 
-use App\Controller\Component\InfiniteScrollComponent;
+use Skeleton\Controller\Component\InfiniteScrollComponent;
 use Cake\Controller\ComponentRegistry;
 use Cake\TestSuite\TestCase;
 
 /**
- * App\Controller\Component\InfiniteScrollComponent Test Case
+ * Skeleton\Controller\Component\InfiniteScrollComponent Test Case
  */
 class InfiniteScrollComponentTest extends TestCase
 {
@@ -14,7 +14,7 @@ class InfiniteScrollComponentTest extends TestCase
     /**
      * Test subject
      *
-     * @var \App\Controller\Component\InfiniteScrollComponent
+     * @var \Skeleton\Controller\Component\InfiniteScrollComponent
      */
     public $InfiniteScroll;
 

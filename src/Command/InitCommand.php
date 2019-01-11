@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Command;
+namespace Skeleton\Command;
 
 use Cake\Console\Arguments;
 use Cake\Console\Command;

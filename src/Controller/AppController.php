@@ -40,7 +40,7 @@ class AppController extends Controller
      * tables your controller will be infinite-scrolling.
      *
      * @var array
-     * @see \App\Controller\Component\InfiniteScrollComponent
+     * @see \Skeleton\Controller\Component\InfiniteScrollComponent
      */
     public $infiniteScroll = [];
 
