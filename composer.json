@@ -1,0 +1,35 @@
+{
+    "name": "converallel/web-skeleton",
+    "description": "Skeleton plugin for CakePHP",
+    "type": "cakephp-plugin",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Xun Chen",
+            "role": "Maintainer"
+        }
+    ],
+    "require": {
+        "ext-http": "*",
+        "ext-json": "*",
+        "cakephp/elastic-search": "@stable",
+        "cakephp/cakephp": "3.7.*",
+        "cakephp/migrations": "^2.0.0"
+    },
+    "require-dev": {
+        "cakephp/cakephp-codesniffer": "3.*",
+        "phpunit/phpunit": "6.*",
+        "squizlabs/php_codesniffer": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Skeleton\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Skeleton\\Test\\": "tests/",
+            "Cake\\Test\\": "vendor/cakephp/cakephp/tests/"
+        }
+    }
+}
