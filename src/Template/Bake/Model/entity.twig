@@ -15,7 +15,7 @@ namespace {{ namespace }}\Model\Entity;
 use Cake\ORM\Entity;
 
 {{ DocBlock.classDescription(name, 'Entity', annotations)|raw }}
-class {{ name }} extends Entity
+class {{ name }} extends {{ override ? "\\#{theme}\\Model\\Entity\\#{name}" : 'Entity' }}
 {
 {% if accessible %}
 

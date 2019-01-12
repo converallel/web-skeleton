@@ -19,7 +19,7 @@ class UsersController extends AppController
 
     public function view($id = null)
     {
-        $this->get($id, ['finder' => 'details']);
+        $this->get($id, ['finder' => 'basicInfo']);
     }
 
     public function login()

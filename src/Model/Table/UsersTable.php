@@ -200,7 +200,6 @@ class UsersTable extends Table
                 'given_name',
                 'birthdate',
                 'gender',
-                'verified'
             ]);
     }
 }

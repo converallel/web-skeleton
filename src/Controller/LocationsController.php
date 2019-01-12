@@ -35,6 +35,6 @@ class LocationsController extends AppController
         if (is_null($location))
             throw new RecordNotFoundException("Record not found in table {$this->getName()}");
 
-        $this->setSerialized($location);
+        $this->serialize($location);
     }
 }

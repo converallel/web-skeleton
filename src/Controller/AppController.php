@@ -187,7 +187,7 @@ class AppController extends Controller
         $entities = $this->_infiniteScroll ? $this->infiniteScroll($query, $options) : $this->paginate($query,
             $options);
         if ($this->usingApi) {
-            return $this->setSerialized($entities);
+            return $this->serialize($entities);
         }
         $this->set(lcfirst($this->getName()), $entities);
     }
@@ -217,7 +217,7 @@ class AppController extends Controller
         }
 
         if ($this->usingApi) {
-            return $this->setSerialized($entity);
+            return $this->serialize($entity);
         }
 
         $this->set($this->entityName, $entity);
@@ -243,7 +243,7 @@ class AppController extends Controller
 
             if ($this->Table->save($entity)) {
                 if ($this->usingApi) {
-                    return $this->setSerialized(['id' => $entity->id]);
+                    return $this->serialize(['id' => $entity->id]);
                 }
                 $this->Flash->success(__("The $this->entityName has been saved."));
 
@@ -252,7 +252,7 @@ class AppController extends Controller
 
             $error_message = __("The $this->entityName could not be saved. Please, try again.");
             if ($this->usingApi) {
-                return $this->setSerialized($error_message, 400);
+                return $this->serialize($error_message, 400);
             }
             $this->Flash->error($error_message);
         }
@@ -282,7 +282,7 @@ class AppController extends Controller
                 }
 
                 if ($this->usingApi) {
-                    return $this->setSerialized($ids);
+                    return $this->serialize($ids);
                 }
                 $this->Flash->success(__("The {$this->getName()} has been saved."));
 
@@ -291,7 +291,7 @@ class AppController extends Controller
 
             $error_message = __("The {$this->getName()} could not be saved. Please, try again.");
             if ($this->usingApi) {
-                return $this->setSerialized($error_message, 400);
+                return $this->serialize($error_message, 400);
             }
 
             $this->Flash->error($error_message);
@@ -323,7 +323,7 @@ class AppController extends Controller
 
             if ($this->Table->save($entity)) {
                 if ($this->usingApi) {
-                    return $this->setSerialized(204);
+                    return $this->serialize(204);
                 }
                 $this->Flash->success(__("The $this->entityName has been saved."));
 
@@ -332,7 +332,7 @@ class AppController extends Controller
 
             $error_message = __("The $this->entityName could not be saved. Please, try again.");
             if ($this->usingApi) {
-                return $this->setSerialized($error_message, 400);
+                return $this->serialize($error_message, 400);
             }
             $this->Flash->error($error_message);
         }
@@ -368,13 +368,13 @@ class AppController extends Controller
 
         if ($this->Table->delete($entity)) {
             if ($this->usingApi) {
-                return $this->setSerialized(204);
+                return $this->serialize(204);
             }
             $this->Flash->success(__("The $this->entityName has been deleted."));
         } else {
             $error_message = __("The $this->entityName could not be deleted. Please, try again.");
             if ($this->usingApi) {
-                return $this->setSerialized($error_message, 400);
+                return $this->serialize($error_message, 400);
             }
             $this->Flash->error($error_message);
         }
@@ -405,7 +405,7 @@ class AppController extends Controller
      * @param array|int|string|EntityInterface|ResultSetInterface $data
      * @param int $status
      */
-    public function setSerialized($data = [], $status = 200)
+    public function serialize($data = [], $status = 200)
     {
         if (is_int($data) && 100 <= $data && $data < 600) {
             $status = $data;
