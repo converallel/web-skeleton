@@ -64,72 +64,72 @@ class LocationsTable extends Table
     {
         $validator
             ->nonNegativeInteger('id')
-            ->allowEmpty('id', 'create');
+            ->allowEmptyString('id', 'create');
 
         $validator
             ->latitude('latitude')
             ->requirePresence('latitude', 'create')
-            ->notEmpty('latitude');
+            ->allowEmptyString('latitude', false);
 
         $validator
             ->longitude('longitude')
             ->requirePresence('longitude', 'create')
-            ->notEmpty('longitude');
+            ->allowEmptyString('longitude', false);
 
         $validator
             ->scalar('name')
             ->maxLength('name', 45)
-            ->allowEmpty('name');
+            ->allowEmptyString('name');
 
         $validator
             ->scalar('iso_country_code')
             ->maxLength('iso_country_code', 30)
-            ->allowEmpty('iso_country_code');
+            ->allowEmptyString('iso_country_code');
 
         $validator
             ->scalar('country')
             ->maxLength('country', 45)
-            ->allowEmpty('country');
+            ->allowEmptyString('country');
 
         $validator
             ->scalar('postal_code')
             ->maxLength('postal_code', 20)
-            ->allowEmpty('postal_code');
+            ->allowEmptyString('postal_code');
 
         $validator
             ->scalar('administrative_area')
             ->maxLength('administrative_area', 45)
-            ->allowEmpty('administrative_area');
+            ->allowEmptyString('administrative_area');
 
         $validator
             ->scalar('sub_administrative_area')
             ->maxLength('sub_administrative_area', 45)
-            ->allowEmpty('sub_administrative_area');
+            ->allowEmptyString('sub_administrative_area');
 
         $validator
             ->scalar('locality')
             ->maxLength('locality', 45)
-            ->allowEmpty('locality');
+            ->allowEmptyString('locality');
 
         $validator
             ->scalar('sub_locality')
             ->maxLength('sub_locality', 45)
-            ->allowEmpty('sub_locality');
+            ->allowEmptyString('sub_locality');
 
         $validator
             ->scalar('thoroughfare')
             ->maxLength('thoroughfare', 45)
-            ->allowEmpty('thoroughfare');
+            ->allowEmptyString('thoroughfare');
 
         $validator
             ->scalar('sub_thoroughfare')
             ->maxLength('sub_thoroughfare', 45)
-            ->allowEmpty('sub_thoroughfare');
+            ->allowEmptyString('sub_thoroughfare');
 
         $validator
             ->scalar('time_zone')
             ->maxLength('time_zone', 50)
-            ->allowEmpty('time_zone');
+            ->allowEmptyString('time_zone');
 
         return $validator;
     }

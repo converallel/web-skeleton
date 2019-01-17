@@ -50,13 +50,13 @@ class HttpStatusCodesTable extends Table
     public function validationDefault(Validator $validator)
     {
         $validator
-            ->allowEmpty('code', 'create');
+            ->allowEmptyString('code', 'create');
 
         $validator
             ->scalar('definition')
             ->maxLength('definition', 40)
             ->requirePresence('definition', 'create')
-            ->notEmpty('definition');
+            ->allowEmptyString('definition', false);
 
         return $validator;
     }

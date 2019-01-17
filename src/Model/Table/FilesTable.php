@@ -54,32 +54,33 @@ class FilesTable extends Table
     {
         $validator
             ->nonNegativeInteger('id')
-            ->allowEmpty('id', 'create');
+            ->allowEmptyString('id', 'create');
 
         $validator
             ->scalar('url')
             ->maxLength('url', 255)
             ->requirePresence('url', 'create')
-            ->notEmpty('url');
+            ->allowEmptyString('url', false);
 
         $validator
             ->scalar('mime_type')
             ->maxLength('mime_type', 20)
             ->requirePresence('mime_type', 'create')
-            ->notEmpty('mime_type');
+            ->allowEmptyString('mime_type', false);
 
         $validator
             ->nonNegativeInteger('size')
             ->requirePresence('size', 'create')
-            ->notEmpty('size');
+            ->allowEmptyString('size', false);
 
         $validator
             ->scalar('notes')
-            ->allowEmpty('notes');
+            ->allowEmptyString('notes');
 
         $validator
             ->boolean('published')
-            ->notEmpty('published');
+            ->requirePresence('published', 'create')
+            ->allowEmptyString('published', false);
 
         return $validator;
     }

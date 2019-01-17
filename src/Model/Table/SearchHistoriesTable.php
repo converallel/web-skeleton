@@ -53,18 +53,18 @@ class SearchHistoriesTable extends Table
     {
         $validator
             ->nonNegativeInteger('id')
-            ->allowEmpty('id', 'create');
+            ->allowEmptyString('id', 'create');
 
         $validator
             ->scalar('type')
             ->requirePresence('type', 'create')
-            ->notEmpty('type');
+            ->allowEmptyString('type', false);
 
         $validator
             ->scalar('query')
             ->maxLength('query', 100)
             ->requirePresence('query', 'create')
-            ->notEmpty('query');
+            ->allowEmptyString('query', false);
 
         return $validator;
     }

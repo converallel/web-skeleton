@@ -57,26 +57,26 @@ class UserLoginsTable extends Table
     {
         $validator
             ->nonNegativeInteger('id')
-            ->allowEmpty('id', 'create');
+            ->allowEmptyString('id', 'create');
 
         $validator
             ->scalar('ip_address')
             ->maxLength('ip_address', 40)
             ->requirePresence('ip_address', 'create')
-            ->notEmpty('ip_address');
+            ->allowEmptyString('ip_address', false);
 
         $validator
             ->scalar('browser')
             ->maxLength('browser', 255)
-            ->allowEmpty('browser');
+            ->allowEmptyString('browser');
 
         $validator
-            ->numeric('latitude')
-            ->allowEmpty('latitude');
+            ->latitude('latitude')
+            ->allowEmptyString('latitude');
 
         $validator
-            ->numeric('longitude')
-            ->allowEmpty('longitude');
+            ->longitude('longitude')
+            ->allowEmptyString('longitude');
 
         return $validator;
     }

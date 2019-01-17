@@ -58,19 +58,19 @@ class DevicesTable extends Table
     {
         $validator
             ->nonNegativeInteger('id')
-            ->allowEmpty('id', 'create');
+            ->allowEmptyString('id', 'create');
 
         $validator
             ->uuid('uuid')
             ->requirePresence('uuid', 'create')
-            ->notEmpty('uuid')
+            ->allowEmptyString('uuid', false)
             ->add('uuid', 'unique', ['rule' => 'validateUnique', 'provider' => 'table']);
 
         $validator
             ->scalar('name')
             ->maxLength('name', 45)
             ->requirePresence('name', 'create')
-            ->notEmpty('name');
+            ->allowEmptyString('name', false);
 
         return $validator;
     }

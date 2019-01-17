@@ -53,18 +53,18 @@ class ContactsTable extends Table
     {
         $validator
             ->nonNegativeInteger('id')
-            ->allowEmpty('id', 'create');
+            ->allowEmptyString('id', 'create');
 
         $validator
             ->scalar('type')
             ->requirePresence('type', 'create')
-            ->notEmpty('type');
+            ->allowEmptyString('type', false);
 
         $validator
             ->scalar('contact')
             ->maxLength('contact', 60)
             ->requirePresence('contact', 'create')
-            ->notEmpty('contact')
+            ->allowEmptyString('contact', false)
             ->add('contact', 'unique', ['rule' => 'validateUnique', 'provider' => 'table']);
 
         return $validator;

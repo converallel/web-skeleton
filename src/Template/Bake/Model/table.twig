@@ -19,8 +19,11 @@ class {{ name }}Table extends {{ override ? "\\#{theme}\\Model\\Table\\#{name}Ta
     public function initialize(array $config)
     {
         parent::initialize($config);
+{% if table or displayField or primaryKey %}
 
-{% if table %}
+{% endif %}
+
+{%- if table %}
         $this->setTable('{{ table }}');
 {% endif %}
 
@@ -73,6 +76,10 @@ class {{ name }}Table extends {{ override ? "\\#{theme}\\Model\\Table\\#{name}Ta
      */
     public function validationDefault(Validator $validator)
     {
+{% if override %}
+        parent::validationDefault($validator);
+        {{- "\n" }}
+{% endif %}
 {% for field, rules in validation %}
 {% set validationMethods = Bake.getValidationMethods(field, rules) %}
 {% if validationMethods %}
@@ -101,6 +108,10 @@ class {{ name }}Table extends {{ override ? "\\#{theme}\\Model\\Table\\#{name}Ta
      */
     public function buildRules(RulesChecker $rules)
     {
+{% if override %}
+        parent::buildRules($rules);
+        {{- "\n" }}
+{% endif %}
 {% for field, rule in rulesChecker %}
         $rules->add($rules->{{ rule.name }}(['{{ field }}']{{ (rule.extra is defined and rule.extra ? (", '#{rule.extra}'") : '')|raw }}));
 {% endfor %}

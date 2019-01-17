@@ -45,23 +45,23 @@ class TimeZonesTable extends Table
     {
         $validator
             ->nonNegativeInteger('id')
-            ->allowEmpty('id', 'create');
+            ->allowEmptyString('id', 'create');
 
         $validator
-            ->numeric('latitude')
+            ->latitude('latitude')
             ->requirePresence('latitude', 'create')
-            ->notEmpty('latitude');
+            ->allowEmptyString('latitude', false);
 
         $validator
-            ->numeric('longitude')
+            ->longitude('longitude')
             ->requirePresence('longitude', 'create')
-            ->notEmpty('longitude');
+            ->allowEmptyString('longitude', false);
 
         $validator
             ->scalar('identifier')
             ->maxLength('identifier', 50)
             ->requirePresence('identifier', 'create')
-            ->notEmpty('identifier');
+            ->allowEmptyString('identifier', false);
 
         return $validator;
     }

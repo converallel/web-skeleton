@@ -57,36 +57,40 @@ class LogsTable extends Table
     {
         $validator
             ->nonNegativeInteger('id')
-            ->allowEmpty('id', 'create');
+            ->allowEmptyString('id', 'create');
 
         $validator
             ->scalar('ip_address')
-            ->maxLength('ip_address', 45)
+            ->maxLength('ip_address', 40)
             ->requirePresence('ip_address', 'create')
-            ->notEmpty('ip_address');
+            ->allowEmptyString('ip_address', false);
 
         $validator
             ->scalar('request_method')
-            ->maxLength('request_method', 10)
             ->requirePresence('request_method', 'create')
-            ->notEmpty('request_method');
+            ->allowEmptyString('request_method', false);
 
         $validator
             ->scalar('request_url')
             ->maxLength('request_url', 45)
             ->requirePresence('request_url', 'create')
-            ->notEmpty('request_url');
+            ->allowEmptyString('request_url', false);
 
         $validator
             ->requirePresence('request_headers', 'create')
-            ->notEmpty('request_headers');
+            ->allowEmptyString('request_headers', false);
 
         $validator
-            ->allowEmpty('request_body');
+            ->allowEmptyString('request_body');
 
         $validator
             ->requirePresence('status_code', 'create')
-            ->notEmpty('status_code');
+            ->allowEmptyString('status_code', false);
+
+        $validator
+            ->dateTime('created_at')
+            ->requirePresence('created_at', 'create')
+            ->allowEmptyDateTime('created_at', false);
 
         return $validator;
     }

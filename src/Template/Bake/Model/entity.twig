@@ -12,11 +12,32 @@
 
 namespace {{ namespace }}\Model\Entity;
 
+{% if not override %}
 use Cake\ORM\Entity;
 
+{% endif %}
 {{ DocBlock.classDescription(name, 'Entity', annotations)|raw }}
 class {{ name }} extends {{ override ? "\\#{theme}\\Model\\Entity\\#{name}" : 'Entity' }}
 {
+{% if override %}
+
+    public function __construct(array $properties = [], array $options = [])
+    {
+        parent::__construct($properties, $options);
+
+{% if accessible %}
+        $this->_accessible += [{{ Bake.stringifyList(accessible, {'indent': 3, 'quotes': false})|raw }}];
+{% else %}
+        //$this->_accessible += [];
+{% endif %}
+
+{% if hidden %}
+        $this->_hidden += [{{ Bake.stringifyList(hidden, {'indent': 3})|raw }}];
+{% else %}
+        //$this->_hidden += [];
+{% endif %}
+    }
+{% else %}
 {% if accessible %}
 
     /**
@@ -39,6 +60,7 @@ class {{ name }} extends {{ override ? "\\#{theme}\\Model\\Entity\\#{name}" : 'E
      * @var array
      */
     protected $_hidden = [{{ Bake.stringifyList(hidden)|raw }}];
+{% endif %}
 {% endif %}
 
 {%- if not accessible and not hidden %}

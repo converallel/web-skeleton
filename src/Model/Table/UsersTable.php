@@ -96,11 +96,11 @@ class UsersTable extends Table
     {
         $validator
             ->nonNegativeInteger('id')
-            ->allowEmpty('id', 'create');
+            ->allowEmptyString('id', 'create');
 
         $validator
             ->email('email')
-            ->allowEmpty('email')
+            ->allowEmptyString('email')
             ->add('email', 'unique', ['rule' => 'validateUnique', 'provider' => 'table']);
 
         $validator
@@ -117,43 +117,30 @@ class UsersTable extends Table
             ->requirePresence('password', 'create');
 
         $validator
-            ->range('failed_login_attempts', [0, 5])
-            ->notEmpty('failed_login_attempts');
+            ->requirePresence('failed_login_attempts', 'create')
+            ->allowEmptyString('failed_login_attempts', false);
 
         $validator
             ->scalar('given_name')
             ->maxLength('given_name', 45)
             ->requirePresence('given_name', 'create')
-            ->notEmpty('given_name');
+            ->allowEmptyString('given_name', false);
 
         $validator
             ->scalar('family_name')
             ->maxLength('family_name', 45)
             ->requirePresence('family_name', 'create')
-            ->notEmpty('family_name');
+            ->allowEmptyString('family_name', false);
 
         $validator
             ->date('birthdate')
             ->requirePresence('birthdate', 'create')
-            ->notEmpty('birthdate');
+            ->allowEmptyDate('birthdate', false);
 
         $validator
             ->scalar('gender')
             ->requirePresence('gender', 'create')
-            ->notEmpty('gender');
-
-        $validator
-            ->scalar('bio')
-            ->maxLength('bio', 300)
-            ->allowEmpty('bio');
-
-        $validator
-            ->range('rating', [1, 10], "User's rating should be a number between 1 and 10")
-            ->notEmpty('rating');
-
-        $validator
-            ->boolean('verified')
-            ->notEmpty('verified');
+            ->allowEmptyString('gender', false);
 
         return $validator;
     }
@@ -171,8 +158,6 @@ class UsersTable extends Table
         $rules->add($rules->isUnique(['phone_number']));
         $rules->add($rules->existsIn(['location_id'], 'Locations'));
         $rules->add($rules->existsIn(['profile_image_id'], 'ProfileImageFile'));
-        $rules->add($rules->existsIn(['personality_id'], 'Personalities'));
-        $rules->add($rules->existsIn(['education_id'], 'Education'));
 
         return $rules;
     }
