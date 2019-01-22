@@ -37,18 +37,6 @@ class LocationsTable extends Table
         $this->setDisplayField('name');
         $this->setPrimaryKey('id');
 
-        $this->hasMany('Activities', [
-            'foreignKey' => 'location_id'
-        ]);
-        $this->hasMany('ActivityFilters', [
-            'foreignKey' => 'location_id'
-        ]);
-        $this->hasMany('ActivityItineraries', [
-            'foreignKey' => 'location_id'
-        ]);
-        $this->hasMany('LocationSelectionHistories', [
-            'foreignKey' => 'location_id'
-        ]);
         $this->hasMany('Users', [
             'foreignKey' => 'location_id'
         ]);

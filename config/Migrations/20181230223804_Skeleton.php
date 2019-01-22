@@ -11,83 +11,6 @@ class Skeleton extends AbstractMigration
     public function up()
     {
 
-        $this->table('contacts')
-            ->addColumn('id', 'integer', [
-                'autoIncrement' => true,
-                'default' => null,
-                'limit' => 11,
-                'null' => false,
-                'signed' => false,
-            ])
-            ->addPrimaryKey(['id'])
-            ->addColumn('user_id', 'integer', [
-                'default' => null,
-                'limit' => 11,
-                'null' => false,
-                'signed' => false,
-            ])
-            ->addColumn('type', 'enum', [
-                'default' => null,
-                'limit' => null,
-                'null' => false,
-                'values' => ['Email', 'Phone']
-            ])
-            ->addColumn('contact', 'string', [
-                'default' => null,
-                'limit' => 60,
-                'null' => false,
-            ])
-            ->addIndex(
-                [
-                    'contact',
-                ],
-                ['unique' => true]
-            )
-            ->create();
-
-        $this->table('devices')
-            ->addColumn('id', 'integer', [
-                'autoIncrement' => true,
-                'default' => null,
-                'limit' => 11,
-                'null' => false,
-                'signed' => false,
-            ])
-            ->addPrimaryKey(['id'])
-            ->addColumn('user_id', 'integer', [
-                'default' => null,
-                'limit' => 11,
-                'null' => false,
-                'signed' => false,
-            ])
-            ->addColumn('uuid', 'uuid', [
-                'default' => null,
-                'limit' => null,
-                'null' => false,
-            ])
-            ->addColumn('name', 'string', [
-                'default' => null,
-                'limit' => 45,
-                'null' => false,
-            ])
-            ->addColumn('deleted_at', 'timestamp', [
-                'default' => null,
-                'limit' => null,
-                'null' => true,
-            ])
-            ->addIndex(
-                [
-                    'user_id',
-                ]
-            )
-            ->addIndex(
-                [
-                    'uuid',
-                ],
-                ['unique' => true]
-            )
-            ->create();
-
         $this->table('files')
             ->addColumn('id', 'integer', [
                 'autoIncrement' => true,
@@ -151,21 +74,6 @@ class Skeleton extends AbstractMigration
                     'user_id',
                 ]
             )
-            ->create();
-
-        $this->table('http_status_codes')
-            ->addColumn('code', 'integer', [
-                'default' => null,
-                'limit' => MysqlAdapter::INT_SMALL,
-                'null' => false,
-                'signed' => false,
-            ])
-            ->addPrimaryKey(['code'])
-            ->addColumn('definition', 'string', [
-                'default' => null,
-                'limit' => 40,
-                'null' => false,
-            ])
             ->create();
 
         $this->table('locations')
@@ -253,70 +161,6 @@ class Skeleton extends AbstractMigration
             )
             ->create();
 
-        $this->table('logs')
-            ->addColumn('id', 'integer', [
-                'autoIncrement' => true,
-                'default' => null,
-                'limit' => 11,
-                'null' => false,
-                'signed' => false,
-            ])
-            ->addPrimaryKey(['id'])
-            ->addColumn('user_id', 'integer', [
-                'default' => null,
-                'limit' => 11,
-                'null' => true,
-                'signed' => false,
-            ])
-            ->addColumn('ip_address', 'string', [
-                'default' => null,
-                'limit' => 40,
-                'null' => false,
-            ])
-            ->addColumn('request_method', 'enum', [
-                'default' => null,
-                'limit' => 10,
-                'null' => false,
-                'values' => ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'TRACE', 'PATCH']
-            ])
-            ->addColumn('request_url', 'string', [
-                'default' => null,
-                'limit' => 45,
-                'null' => false,
-            ])
-            ->addColumn('request_headers', 'json', [
-                'default' => null,
-                'limit' => null,
-                'null' => false,
-            ])
-            ->addColumn('request_body', 'json', [
-                'default' => null,
-                'limit' => null,
-                'null' => true,
-            ])
-            ->addColumn('status_code', 'integer', [
-                'default' => null,
-                'limit' => MysqlAdapter::INT_SMALL,
-                'null' => false,
-                'signed' => false,
-            ])
-            ->addColumn('created_at', 'timestamp', [
-                'default' => 'CURRENT_TIMESTAMP',
-                'limit' => null,
-                'null' => false,
-            ])
-            ->addIndex(
-                [
-                    'user_id',
-                ]
-            )
-            ->addIndex(
-                [
-                    'status_code',
-                ]
-            )
-            ->create();
-
         $this->table('search_histories')
             ->addColumn('id', 'integer', [
                 'autoIncrement' => true,
@@ -398,69 +242,6 @@ class Skeleton extends AbstractMigration
             )
             ->create();
 
-        $this->table('user_logins')
-            ->addColumn('id', 'integer', [
-                'autoIncrement' => true,
-                'default' => null,
-                'limit' => 11,
-                'null' => false,
-                'signed' => false,
-            ])
-            ->addPrimaryKey(['id'])
-            ->addColumn('user_id', 'integer', [
-                'default' => null,
-                'limit' => 11,
-                'null' => false,
-                'signed' => false,
-            ])
-            ->addColumn('ip_address', 'string', [
-                'default' => null,
-                'limit' => 40,
-                'null' => false,
-            ])
-            ->addColumn('device_id', 'integer', [
-                'default' => null,
-                'limit' => 11,
-                'null' => true,
-                'signed' => false,
-            ])
-            ->addColumn('browser', 'string', [
-                'default' => null,
-                'limit' => 255,
-                'null' => true,
-            ])
-            ->addColumn('latitude', 'float', [
-                'default' => null,
-                'null' => true,
-                'precision' => 10,
-                'scale' => 7,
-            ])
-            ->addColumn('longitude', 'float', [
-                'default' => null,
-                'null' => true,
-                'precision' => 10,
-                'scale' => 7,
-            ])
-            ->addColumn('created_at', 'timestamp', [
-                'default' => 'CURRENT_TIMESTAMP',
-                'limit' => null,
-                'null' => false,
-            ])
-            ->addIndex(
-                [
-                    'user_id',
-                    'device_id',
-                    'created_at'
-                ],
-                ['unique' => true]
-            )
-            ->addIndex(
-                [
-                    'device_id',
-                ]
-            )
-            ->create();
-
         $this->table('users')
             ->addColumn('id', 'integer', [
                 'autoIncrement' => true,
@@ -479,17 +260,6 @@ class Skeleton extends AbstractMigration
                 'default' => null,
                 'limit' => 20,
                 'null' => true,
-            ])
-            ->addColumn('password', 'char', [
-                'default' => null,
-                'limit' => 60,
-                'null' => false,
-            ])
-            ->addColumn('failed_login_attempts', 'integer', [
-                'default' => '0',
-                'limit' => MysqlAdapter::INT_TINY,
-                'null' => false,
-                'signed' => false,
             ])
             ->addColumn('given_name', 'string', [
                 'default' => null,
@@ -558,30 +328,6 @@ class Skeleton extends AbstractMigration
             )
             ->create();
 
-        $this->table('contacts')
-            ->addForeignKey(
-                'user_id',
-                'users',
-                'id',
-                [
-                    'update' => 'CASCADE',
-                    'delete' => 'CASCADE'
-                ]
-            )
-            ->update();
-
-        $this->table('devices')
-            ->addForeignKey(
-                'user_id',
-                'users',
-                'id',
-                [
-                    'update' => 'CASCADE',
-                    'delete' => 'CASCADE'
-                ]
-            )
-            ->update();
-
         $this->table('files')
             ->addForeignKey(
                 'user_id',
@@ -594,49 +340,7 @@ class Skeleton extends AbstractMigration
             )
             ->update();
 
-        $this->table('logs')
-            ->addForeignKey(
-                'status_code',
-                'http_status_codes',
-                'code',
-                [
-                    'update' => 'CASCADE',
-                    'delete' => 'NO_ACTION'
-                ]
-            )
-            ->addForeignKey(
-                'user_id',
-                'users',
-                'id',
-                [
-                    'update' => 'CASCADE',
-                    'delete' => 'CASCADE'
-                ]
-            )
-            ->update();
-
         $this->table('search_histories')
-            ->addForeignKey(
-                'user_id',
-                'users',
-                'id',
-                [
-                    'update' => 'CASCADE',
-                    'delete' => 'CASCADE'
-                ]
-            )
-            ->update();
-
-        $this->table('user_logins')
-            ->addForeignKey(
-                'device_id',
-                'devices',
-                'id',
-                [
-                    'update' => 'CASCADE',
-                    'delete' => 'CASCADE'
-                ]
-            )
             ->addForeignKey(
                 'user_id',
                 'users',
@@ -688,38 +392,12 @@ class Skeleton extends AbstractMigration
     public function down()
     {
 
-        $this->table('contacts')
-            ->dropForeignKey(
-                'user_id'
-            )->save();
-
-        $this->table('devices')
-            ->dropForeignKey(
-                'user_id'
-            )->save();
-
         $this->table('files')
             ->dropForeignKey(
                 'user_id'
             )->save();
 
-        $this->table('logs')
-            ->dropForeignKey(
-                'status_code'
-            )
-            ->dropForeignKey(
-                'user_id'
-            )->save();
-
         $this->table('search_histories')
-            ->dropForeignKey(
-                'user_id'
-            )->save();
-
-        $this->table('user_logins')
-            ->dropForeignKey(
-                'device_id'
-            )
             ->dropForeignKey(
                 'user_id'
             )->save();
@@ -732,15 +410,10 @@ class Skeleton extends AbstractMigration
                 'profile_image_id'
             )->save();
 
-        $this->table('contacts')->drop()->save();
-        $this->table('devices')->drop()->save();
         $this->table('files')->drop()->save();
-        $this->table('http_status_codes')->drop()->save();
         $this->table('locations')->drop()->save();
-        $this->table('logs')->drop()->save();
         $this->table('search_histories')->drop()->save();
         $this->table('time_zones')->drop()->save();
-        $this->table('user_logins')->drop()->save();
         $this->table('users')->drop()->save();
     }
 }

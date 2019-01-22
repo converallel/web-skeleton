@@ -19,10 +19,6 @@ class LocationsControllerTest extends TestCase
      */
     public $fixtures = [
         'app.Locations',
-        'app.Activities',
-        'app.ActivityFilters',
-        'app.ActivityItineraries',
-        'app.LocationSelectionHistories',
         'app.Users'
     ];
 

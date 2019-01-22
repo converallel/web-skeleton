@@ -28,15 +28,16 @@ class UsersController extends AppController
             $user = $this->Auth->identify();
             if ($user) {
                 $this->Auth->setUser($user);
-                if ($this->Auth->authenticationProvider()->needsPasswordRehash()) {
-                    $user = $this->Users->get($this->Auth->user('id'));
-                    $user->password = $this->request->getData('password');
-                    $this->Users->save($user);
-                }
                 return $this->redirect($this->Auth->redirectUrl());
-            } else {
-                $this->Flash->error(__('Username or password is incorrect'));
             }
+            $this->Flash->error(__('Username or password is incorrect'));
+        }
+    }
+
+    public function signUp()
+    {
+        if ($this->request->is('post')) {
+
         }
     }
 }

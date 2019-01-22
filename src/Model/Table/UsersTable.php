@@ -2,7 +2,6 @@
 
 namespace Skeleton\Model\Table;
 
-use Cake\Event\Event;
 use Cake\ORM\Query;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
@@ -13,12 +12,9 @@ use Cake\Validation\Validator;
  *
  * @property \Skeleton\Model\Table\LocationsTable|\Cake\ORM\Association\BelongsTo $Locations
  * @property \Skeleton\Model\Table\FilesTable|\Cake\ORM\Association\BelongsTo $ProfileImageFile
- * @property \Skeleton\Model\Table\ContactsTable|\Cake\ORM\Association\HasMany $Contacts
- * @property \Skeleton\Model\Table\DevicesTable|\Cake\ORM\Association\HasMany $Devices
  * @property \Skeleton\Model\Table\FilesTable|\Cake\ORM\Association\HasMany $Files
- * @property \Skeleton\Model\Table\LogsTable|\Cake\ORM\Association\HasMany $Logs
+ * @property \Crud\Model\Table\LogsTable|\Cake\ORM\Association\HasMany $Logs
  * @property \Skeleton\Model\Table\SearchHistoriesTable|\Cake\ORM\Association\HasMany $SearchHistories
- * @property \Skeleton\Model\Table\UserLoginsTable|\Cake\ORM\Association\HasMany $UserLogins
  *
  * @method \Skeleton\Model\Entity\User get($primaryKey, $options = [])
  * @method \Skeleton\Model\Entity\User newEntity($data = null, array $options = [])
@@ -55,14 +51,6 @@ class UsersTable extends Table
             'className' => 'Files',
             'foreignKey' => 'profile_image_id'
         ]);
-        $this->hasMany('Contacts', [
-            'foreignKey' => 'user_id'
-        ]);
-        $this->hasMany('Devices', [
-            'foreignKey' => 'user_id',
-            'cascadeCallbacks' => true,
-            'dependent' => true
-        ]);
         $this->hasMany('Files', [
             'foreignKey' => 'user_id',
             'cascadeCallbacks' => true,
@@ -74,16 +62,6 @@ class UsersTable extends Table
         $this->hasMany('SearchHistories', [
             'foreignKey' => 'user_id'
         ]);
-        $this->hasMany('UserLogins', [
-            'foreignKey' => 'user_id'
-        ]);
-    }
-
-    public function beforeMarshal(Event $event, \ArrayObject $data, \ArrayObject $options)
-    {
-        if (isset($data['password'])) {
-            $data['password'] = (string)$data['password'];
-        }
     }
 
     /**

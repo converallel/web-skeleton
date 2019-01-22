@@ -1,5 +1,6 @@
 <?php
 
+use Cake\Core\Configure;
 use Cake\Routing\RouteBuilder;
 use Cake\Routing\Router;
 
@@ -25,8 +26,16 @@ Router::plugin('Skeleton', ['path' => '/'], function (RouteBuilder $routes) {
     //    $routes->resources('Settings');
 
     $routes->resources('Users', ['only' => ['view', 'create', 'update', 'delete']], function (RouteBuilder $routes) {
-        $routes->resources('Contacts', ['only' => ['index']]);
         $routes->resources('Locations', ['only' => ['update']]);
         $routes->resources('Files', ['only' => ['index']]);
     });
+
+    $routes->connect('/signUp', ['controller' => 'users', 'action' => 'signUp'], ['_method' => ['GET', 'POST']]);
+
+    $routes->connect('/login/:provider', ['controller' => 'users', 'action' => 'login'],
+        [
+            'provider' => implode('|', array_keys(Configure::read('OAuth2.providers'))),
+            '_method' => ['GET', 'POST']
+        ]
+    );
 });

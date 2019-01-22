@@ -75,22 +75,7 @@ class AppController extends Controller
 
 //        $this->loadComponent('Auth', [
 //            'authenticate' => [
-//                'OAuth2' => [
-//                    'providers' => [
-//                        'Native' => [
-//                            'className' => '\Native\OAuth2\Client\Provider\Native',
-//                            // all options defined here are passed to the provider's constructor
-//                            'options' => [
-//                                'clientId' => 'foo',
-//                                'clientSecret' => 'bar',
-//                            ],
-//                            'mapFields' => [
-//                                'username' => 'login', // maps the app's username to github's login
-//                            ],
-//                            // ... add here the usual AuthComponent configuration if needed like fields, etc.
-//                        ],
-//                    ]
-//                ]
+//                'OAuth2'
 //            ]
 //        ]);
 

@@ -5,7 +5,6 @@ namespace Skeleton;
 use Cake\Core\BasePlugin;
 use Cake\Core\PluginApplicationInterface;
 use Skeleton\Middleware\AuthenticationMiddleware;
-use Skeleton\Middleware\LoggingMiddleware;
 
 /**
  * Plugin for Skeleton
@@ -20,7 +19,6 @@ class Plugin extends BasePlugin
      */
     public function middleware($middleware)
     {
-        $middleware->prepend(new LoggingMiddleware());
         $middleware->prepend(new AuthenticationMiddleware());
         return $middleware;
     }

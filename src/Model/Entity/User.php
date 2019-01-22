@@ -9,10 +9,6 @@ use Cake\ORM\Entity;
  * User Entity
  *
  * @property int $id
- * @property string|null $email
- * @property string|null $phone_number
- * @property string $password
- * @property int $failed_login_attempts
  * @property string $given_name
  * @property string $family_name
  * @property \Cake\I18n\FrozenDate $birthdate
@@ -23,12 +19,9 @@ use Cake\ORM\Entity;
  * @property \Cake\I18n\FrozenTime|null $deleted_at
  *
  * @property \Skeleton\Model\Entity\Location $location
- * @property \Skeleton\Model\Entity\Contact[] $contacts
- * @property \Skeleton\Model\Entity\Device[] $devices
  * @property \Skeleton\Model\Entity\File[] $files
- * @property \Skeleton\Model\Entity\Log[] $logs
+ * @property \Crud\Model\Entity\Log[] $logs
  * @property \Skeleton\Model\Entity\SearchHistory[] $search_histories
- * @property \Skeleton\Model\Entity\UserLogin[] $user_logins
  */
 class User extends Entity
 {
@@ -44,10 +37,6 @@ class User extends Entity
      * @var array
      */
     protected $_accessible = [
-        'email' => true,
-        'phone_number' => true,
-        'password' => true,
-        'failed_login_attempts' => true,
         'given_name' => true,
         'family_name' => true,
         'birthdate' => true,

@@ -66,21 +66,12 @@ class UsersFixture extends TestFixture
         $this->records = [
             [
                 'id' => 1,
-                'email' => 'chenxun127@gmail.com',
-                'phone_number' => '6174802838',
-                'password' => '$2y$10$vcXAc5vfKxMVVVyoXtFpl.WKir0UKjvAIAZaU8QoRifHksW.T2PrS',
-                'failed_login_attempts' => 0,
                 'given_name' => 'Xun',
                 'family_name' => 'Chen',
                 'birthdate' => '1997-01-27 00:00:00',
                 'gender' => 'Male',
-                'sexual_orientation' => 'Straight',
                 'location_id' => 1,
                 'profile_image_id' => null,
-                'personality_id' => 11,
-                'bio' => null,
-                'rating' => 10,
-                'verified' => true,
                 'created_at' => '2018-12-14 17:40:07',
                 'deleted_at' => null
             ],

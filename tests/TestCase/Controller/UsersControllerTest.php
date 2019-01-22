@@ -20,21 +20,12 @@ class UsersControllerTest extends TestCase
     public $fixtures = [
         'app.Users',
         'app.Locations',
-        'app.Personalities',
-        'app.Education',
-        'app.AdministratedActivities',
-        'app.ActivityFilterEducation',
-        'app.ActivityFilters',
-        'app.Applications',
         'app.Contacts',
         'app.Devices',
         'app.Files',
-        'app.LocationSelectionHistories',
         'app.Logs',
-        'app.Reviews',
         'app.SearchHistories',
         'app.UserLogins',
-        'app.Activities',
         'app.Tags'
     ];
 
