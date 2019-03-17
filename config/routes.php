@@ -10,7 +10,7 @@ use League\OAuth2\Server\ResourceServer;
 Router::plugin('Skeleton', ['path' => '/'], function (RouteBuilder $routes) {
 
     // Register OAuth resource middleware
-    $accessTokens = TableRegistry::getTableLocator()->get('AccessTokens');
+    $accessTokens = TableRegistry::getTableLocator()->get('Skeleton.OauthAccessTokens');
     $publicKeyPath = CONFIG . 'oauth-public.key';
     $resourceServer = new ResourceServer($accessTokens, $publicKeyPath);
     $routes->registerMiddleware('resource', new ResourceServerMiddleware($resourceServer));

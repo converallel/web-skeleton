@@ -140,11 +140,7 @@ class OauthAccessTokensTable extends Table implements AccessTokenRepositoryInter
         if ($this->exists(['id' => $accessTokenId])) {
             throw UniqueTokenIdentifierConstraintViolationException::create();
         }
-        if ($this->save($accessTokenEntity)) {
-        } else {
-            var_dump($accessTokenEntity->getErrors());
-            exit;
-        }
+        $this->save($accessTokenEntity);
     }
 
     /**

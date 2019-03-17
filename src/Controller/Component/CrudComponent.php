@@ -293,8 +293,15 @@ class CrudComponent extends Component
             $className = $this->_controller->getName();
             $displayField = $this->_table->getDisplayField();
 
-            // get all visible fields except 'XXX_id' where 'XXX' is in the fields
-            $fields = $entity instanceof EntityInterface ? $entity->visibleProperties() : $entity->first()->visibleProperties();
+            // get all visible fields
+            $fields = [];
+            if ($entity instanceof ResultSetInterface && $entity->count() > 0) {
+                 $fields = $entity->first()->visibleProperties();
+            } elseif ($entity instanceof EntityInterface) {
+                $fields = $entity->visibleProperties();
+            }
+
+            // sanitize fields, remove 'XXX_id' where 'XXX' is in the fields
             $fields = array_filter($fields, function ($field) use ($fields) {
                 $components = explode('_', $field);
                 if (count($components) > 1) {
@@ -305,7 +312,7 @@ class CrudComponent extends Component
                 return true;
             });
 
-            // set accessible fields if action requires user input
+            // set $accessibleFields if action requires user input
             if (in_array($action, ['add', 'edit'])) {
                 $entityFields = array_merge($this->_table->getSchema()->columns(), array_map(function ($association) {
                     return Inflector::underscore($association);
@@ -586,7 +593,7 @@ class CrudComponent extends Component
      *
      * Will load the referenced Table object, and have the InfiniteScrollComponent
      * scroll the query using the request data and settings defined in
-     * `$this->loadComponent('Crud.Crud, ['infiniteScroll' => $settings])`.
+     * `$this->loadComponent('Skeleton.Crud, ['infiniteScroll' => $settings])`.
      *
      * @param \Cake\ORM\Table|string|\Cake\ORM\Query|null $object Table to infiniteScroll
      * (e.g: Table instance, 'TableName' or a Query object)
@@ -596,7 +603,7 @@ class CrudComponent extends Component
      */
     public function infiniteScroll($object = null, array $settings = [])
     {
-        $this->_controller->loadComponent('Crud.InfiniteScroll');
+        $this->_controller->loadComponent('Skeleton.InfiniteScroll');
         $settings += $this->getConfig('infiniteScroll', []);
 
         return $this->_controller->InfiniteScroll->scroll($object, $settings);

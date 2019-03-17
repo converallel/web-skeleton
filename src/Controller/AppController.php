@@ -5,23 +5,12 @@ namespace Skeleton\Controller;
 use Cake\Controller\Controller;
 use Cake\Controller\Exception\SecurityException;
 use Cake\Core\Configure;
-use Cake\Datasource\EntityInterface;
-use Cake\Datasource\ResultSetInterface;
 use Cake\Event\Event;
-use Cake\Http\Exception\ForbiddenException;
-use Cake\Http\Exception\NotFoundException;
-use Cake\ORM\Query;
 use Cake\Routing\Router;
-use Cake\Utility\Inflector;
 
 /**
  * Class AppController
  * @package Skeleton\Controller
- *
- * @property \Skeleton\Model\Entity\User|null $currentUser
- * @property \Cake\ORM\Table $Table
- * @property boolean $usingApi
- * @property string entityName
  *
  * @property \Skeleton\Controller\Component\CrudComponent $Crud
  * @property \Skeleton\Controller\Component\InfiniteScrollComponent $InfiniteScroll
@@ -38,7 +27,13 @@ class AppController extends Controller
      * @var array
      * @see \Skeleton\Controller\Component\InfiniteScrollComponent
      */
-    public $infiniteScroll = [];
+//    public $infiniteScroll = [];
+
+    /**
+     * The current identified user.
+     * @var \Skeleton\Model\Entity\User|null
+     */
+    public $currentUser = null;
 
     /**
      * Initialization hook method.
@@ -57,11 +52,13 @@ class AppController extends Controller
         $this->loadComponent('RequestHandler', [
             'enableBeforeRedirect' => false,
         ]);
-//        $this->loadComponent('Security', ['blackHoleCallback' => 'forceSSL']);
         $this->loadComponent('Flash');
-        $this->loadComponent('Crud', [
-//            'infiniteScroll' => []
+        $this->loadComponent('Skeleton.Crud', [
+            //'infiniteScroll' => []
         ]);
+        if (!Configure::read('debug')) {
+            $this->loadComponent('Security', ['blackHoleCallback' => 'forceSSL']);
+        }
     }
 
     //======================================================================
