@@ -70,6 +70,15 @@ class ModelTask extends \Bake\Shell\Task\ModelTask
             $data = $diff;
         }
 
+        // add traits
+        $tableUseStatements = [];
+        $tableTraits = [];
+        if ($tableObject->hasField('deleted_at')) {
+            $tableUseStatements[] = 'Skeleton\\Model\\Table\\SoftDeleteTrait';
+            $tableTraits[] = 'SoftDeleteTrait';
+        }
+        $data = $data + compact('tableUseStatements', 'tableTraits');
+
         $this->bakeTable($tableObject, $data);
         $this->bakeEntity($tableObject, $data);
         $this->bakeFixture($tableObject->getAlias(), $tableObject->getTable());

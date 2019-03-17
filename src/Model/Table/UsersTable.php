@@ -2,18 +2,29 @@
 
 namespace Skeleton\Model\Table;
 
+use Cake\Auth\DefaultPasswordHasher;
+use Cake\Http\Exception\ForbiddenException;
 use Cake\ORM\Query;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
+use League\OAuth2\Server\Entities\ClientEntityInterface;
+use League\OAuth2\Server\Entities\UserEntityInterface;
+use League\OAuth2\Server\Repositories\UserRepositoryInterface;
 
 /**
  * Users Model
  *
  * @property \Skeleton\Model\Table\LocationsTable|\Cake\ORM\Association\BelongsTo $Locations
  * @property \Skeleton\Model\Table\FilesTable|\Cake\ORM\Association\BelongsTo $ProfileImageFile
+ * @property \Skeleton\Model\Table\ContactsTable|\Cake\ORM\Association\HasMany $Contacts
+ * @property \Skeleton\Model\Table\DevicesTable|\Cake\ORM\Association\HasMany $Devices
  * @property \Skeleton\Model\Table\FilesTable|\Cake\ORM\Association\HasMany $Files
- * @property \Crud\Model\Table\LogsTable|\Cake\ORM\Association\HasMany $Logs
+ * @property \Skeleton\Model\Table\LoginsTable|\Cake\ORM\Association\HasMany $Logins
+ * @property \Skeleton\Model\Table\LogsTable|\Cake\ORM\Association\HasMany $Logs
+ * @property \Skeleton\Model\Table\OauthAccessTokensTable|\Cake\ORM\Association\HasMany $OauthAccessTokens
+ * @property \Skeleton\Model\Table\OauthAuthorizationCodesTable|\Cake\ORM\Association\HasMany $OauthAuthorizationCodes
+ * @property \Skeleton\Model\Table\OauthClientsTable|\Cake\ORM\Association\HasMany $OauthClients
  * @property \Skeleton\Model\Table\SearchHistoriesTable|\Cake\ORM\Association\HasMany $SearchHistories
  *
  * @method \Skeleton\Model\Entity\User get($primaryKey, $options = [])
@@ -25,7 +36,7 @@ use Cake\Validation\Validator;
  * @method \Skeleton\Model\Entity\User[] patchEntities($entities, array $data, array $options = [])
  * @method \Skeleton\Model\Entity\User findOrCreate($search, callable $callback = null, $options = [])
  */
-class UsersTable extends Table
+class UsersTable extends Table implements UserRepositoryInterface
 {
     use SoftDeleteTrait;
 
@@ -51,12 +62,32 @@ class UsersTable extends Table
             'className' => 'Files',
             'foreignKey' => 'profile_image_id'
         ]);
+        $this->hasMany('Contacts', [
+            'foreignKey' => 'user_id'
+        ]);
+        $this->hasMany('Devices', [
+            'foreignKey' => 'user_id',
+            'cascadeCallbacks' => true,
+            'dependent' => true
+        ]);
         $this->hasMany('Files', [
             'foreignKey' => 'user_id',
             'cascadeCallbacks' => true,
             'dependent' => true
         ]);
+        $this->hasMany('Logins', [
+            'foreignKey' => 'user_id'
+        ]);
         $this->hasMany('Logs', [
+            'foreignKey' => 'user_id'
+        ]);
+        $this->hasMany('OauthAccessTokens', [
+            'foreignKey' => 'user_id'
+        ]);
+        $this->hasMany('OauthAuthorizationCodes', [
+            'foreignKey' => 'user_id'
+        ]);
+        $this->hasMany('OauthClients', [
             'foreignKey' => 'user_id'
         ]);
         $this->hasMany('SearchHistories', [
@@ -77,26 +108,16 @@ class UsersTable extends Table
             ->allowEmptyString('id', 'create');
 
         $validator
-            ->email('email')
-            ->allowEmptyString('email')
-            ->add('email', 'unique', ['rule' => 'validateUnique', 'provider' => 'table']);
-
-        $validator
-            ->scalar('phone_number')
-            ->lengthBetween('phone_number', [6, 20])
-            ->requirePresence('phone_number', function ($context) {
-                return $context['newRecord'] && !isset($context['data']['email']);
-            }, "Email and phone number can't both be empty")
-            ->add('phone_number', 'unique', ['rule' => 'validateUnique', 'provider' => 'table']);
+            ->scalar('username')
+            ->maxLength('username', 30)
+            ->allowEmptyString('username')
+            ->add('username', 'unique', ['rule' => 'validateUnique', 'provider' => 'table']);
 
         $validator
             ->scalar('password')
-            ->minLength('password', 6)
-            ->requirePresence('password', 'create');
-
-        $validator
-            ->requirePresence('failed_login_attempts', 'create')
-            ->allowEmptyString('failed_login_attempts', false);
+            ->maxLength('password', 60)
+            ->requirePresence('password', 'create')
+            ->allowEmptyString('password', false);
 
         $validator
             ->scalar('given_name')
@@ -132,8 +153,7 @@ class UsersTable extends Table
      */
     public function buildRules(RulesChecker $rules)
     {
-        $rules->add($rules->isUnique(['email']));
-        $rules->add($rules->isUnique(['phone_number']));
+        $rules->add($rules->isUnique(['username']));
         $rules->add($rules->existsIn(['location_id'], 'Locations'));
         $rules->add($rules->existsIn(['profile_image_id'], 'ProfileImageFile'));
 
@@ -164,5 +184,69 @@ class UsersTable extends Table
                 'birthdate',
                 'gender',
             ]);
+    }
+
+    public function findByUsername(Query $query, array $options)
+    {
+        $username = $options['username'] ?? null;
+
+        return $query
+            ->leftJoin('contacts', 'users.id = contacts.user_id')
+            ->where([
+                'OR' => [
+                    'username' => $username,
+                    'contacts.contact' => $username
+                ]
+            ]);
+    }
+
+    /**
+     * Get a user entity.
+     *
+     * @param string $username
+     * @param string $password
+     * @param string $grantType The grant type used
+     * @param ClientEntityInterface $clientEntity
+     *
+     * @return UserEntityInterface
+     */
+    public function getUserEntityByUserCredentials(
+        $username,
+        $password,
+        $grantType,
+        ClientEntityInterface $clientEntity
+    ) {
+        $user = $this->find('byUsername', ['username' => $username])
+            ->contain(['Clients'])
+            ->where([
+                'password' => (new DefaultPasswordHasher())->hash($password),
+                'failed_login_attempts < 5'
+            ])->first();
+
+        // reset failed login attempts to 0
+        if ($user && $user->get('failed_login_attempts')) {
+            $this->find()->update()->set('failed_login_attempts', 0)->execute();
+            $user->set('failed_login_attempts', 0);
+        }
+
+        return $user;
+    }
+
+    /**
+     * Record the failed login attempt, 5 attempts allowed.
+     * @param string $username
+     */
+    public function recordFailedLoginAttempt($username)
+    {
+        $failed_login_attempts = $this->find()
+            ->select('failed_login_attempts')
+            ->find('byUsername', ['username' => $username])
+            ->first()->get('failed_login_attempts');
+
+        if ($failed_login_attempts >= 5) {
+            throw new ForbiddenException('Your account has been locked due to too many failed login attempts');
+        }
+
+        $this->find()->update()->set('failed_login_attempts', $failed_login_attempts + 1)->execute();
     }
 }

@@ -13,6 +13,6 @@ class LogsController extends AppController
 {
     public function index()
     {
-        $this->load(['contain' => ['Users', 'HttpStatusCodes']]);
+        $this->Crud->load(['contain' => ['Users', 'HttpStatusCodes']]);
     }
 }

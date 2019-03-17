@@ -4,11 +4,17 @@
 namespace {{ namespace }}\Model\Table;
 
 {% set uses = ['use Cake\\ORM\\Query;', 'use Cake\\ORM\\RulesChecker;', 'use Cake\\ORM\\Table;', 'use Cake\\Validation\\Validator;'] %}
+{% for useStatement in tableUseStatements %}
+{% set uses = uses|merge(["use #{useStatement};"]) %}
+{% endfor %}
 {{ uses|join('\n')|raw }}
 
 {{ DocBlock.classDescription(name, 'Model', annotations)|raw }}
 class {{ name }}Table extends {{ override ? "\\#{theme}\\Model\\Table\\#{name}Table" : 'Table' }}
 {
+{% for trait in tableTraits %}
+    use {{ trait }};
+{% endfor %}
 
     /**
      * Initialize method

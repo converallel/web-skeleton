@@ -25,7 +25,6 @@ class LocationsTableTest extends TestCase
      */
     public $fixtures = [
         'app.Locations',
-        'app.LocationSelectionHistories',
         'app.Users'
     ];
 

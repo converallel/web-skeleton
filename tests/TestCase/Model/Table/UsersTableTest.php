@@ -26,13 +26,15 @@ class UsersTableTest extends TestCase
     public $fixtures = [
         'app.Users',
         'app.Locations',
-        'app.Applications',
+        'app.Files',
         'app.Contacts',
         'app.Devices',
-        'app.Files',
+        'app.Logins',
         'app.Logs',
-        'app.SearchHistories',
-        'app.UserLogins'
+        'app.OauthAccessTokens',
+        'app.OauthAuthorizationCodes',
+        'app.OauthClients',
+        'app.SearchHistories'
     ];
 
     /**

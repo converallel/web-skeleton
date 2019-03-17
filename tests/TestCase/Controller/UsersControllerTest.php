@@ -1,14 +1,13 @@
 <?php
 namespace Skeleton\Test\TestCase\Controller;
 
-use Skeleton\Controller\UsersController;
 use Cake\TestSuite\IntegrationTestTrait;
 use Cake\TestSuite\TestCase;
 
 /**
  * Skeleton\Controller\UsersController Test Case
  */
-class UsersControllerTest extends TestCase
+class usersControllerTest extends TestCase
 {
     use IntegrationTestTrait;
 
@@ -20,41 +19,24 @@ class UsersControllerTest extends TestCase
     public $fixtures = [
         'app.Users',
         'app.Locations',
+        'app.ProfileImageFile',
         'app.Contacts',
         'app.Devices',
         'app.Files',
+        'app.Logins',
         'app.Logs',
-        'app.SearchHistories',
-        'app.UserLogins',
-        'app.Tags'
+        'app.OauthAccessTokens',
+        'app.OauthAuthorizationCodes',
+        'app.OauthClients',
+        'app.SearchHistories'
     ];
 
     /**
-     * Test initialize method
+     * Test initial setup
      *
      * @return void
      */
-    public function testInitialize()
-    {
-        $this->markTestIncomplete('Not implemented yet.');
-    }
-
-    /**
-     * Test view method
-     *
-     * @return void
-     */
-    public function testView()
-    {
-        $this->markTestIncomplete('Not implemented yet.');
-    }
-
-    /**
-     * Test login method
-     *
-     * @return void
-     */
-    public function testLogin()
+    public function testInitialization()
     {
         $this->markTestIncomplete('Not implemented yet.');
     }

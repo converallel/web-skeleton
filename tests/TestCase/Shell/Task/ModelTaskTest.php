@@ -6,7 +6,7 @@ use Skeleton\Shell\Task\ModelTask;
 use Cake\TestSuite\TestCase;
 
 /**
- * App\Shell\Task\ModelTask Test Case
+ * Skeleton\Shell\Task\ModelTask Test Case
  */
 class ModelTaskTest extends TestCase
 {

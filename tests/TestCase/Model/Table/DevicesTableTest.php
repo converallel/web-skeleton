@@ -1,22 +1,22 @@
 <?php
 namespace Skeleton\Test\TestCase\Model\Table;
 
-use Skeleton\Model\Table\UserLoginsTable;
+use Skeleton\Model\Table\DevicesTable;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
 
 /**
- * Skeleton\Model\Table\UserLoginsTable Test Case
+ * Skeleton\Model\Table\DevicesTable Test Case
  */
-class UserLoginsTableTest extends TestCase
+class DevicesTableTest extends TestCase
 {
 
     /**
      * Test subject
      *
-     * @var \Skeleton\Model\Table\UserLoginsTable
+     * @var \Skeleton\Model\Table\DevicesTable
      */
-    public $UserLogins;
+    public $Devices;
 
     /**
      * Fixtures
@@ -24,9 +24,9 @@ class UserLoginsTableTest extends TestCase
      * @var array
      */
     public $fixtures = [
-        'app.UserLogins',
+        'app.Devices',
         'app.Users',
-        'app.Devices'
+        'app.Logins'
     ];
 
     /**
@@ -37,8 +37,8 @@ class UserLoginsTableTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-        $config = TableRegistry::getTableLocator()->exists('UserLogins') ? [] : ['className' => UserLoginsTable::class];
-        $this->UserLogins = TableRegistry::getTableLocator()->get('UserLogins', $config);
+        $config = TableRegistry::getTableLocator()->exists('Devices') ? [] : ['className' => DevicesTable::class];
+        $this->Devices = TableRegistry::getTableLocator()->get('Devices', $config);
     }
 
     /**
@@ -48,7 +48,7 @@ class UserLoginsTableTest extends TestCase
      */
     public function tearDown()
     {
-        unset($this->UserLogins);
+        unset($this->Devices);
 
         parent::tearDown();
     }

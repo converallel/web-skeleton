@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Auth;
+namespace Skeleton\Auth;
 
 use Cake\Auth\BaseAuthenticate;
 use Cake\Controller\ComponentRegistry;

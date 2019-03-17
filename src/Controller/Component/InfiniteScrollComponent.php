@@ -3,6 +3,7 @@
 namespace Skeleton\Controller\Component;
 
 use Cake\Controller\Component;
+use Cake\Controller\ComponentRegistry;
 use Cake\Core\InstanceConfigTrait;
 use Cake\Datasource\QueryInterface;
 use Cake\Datasource\RepositoryInterface;
@@ -52,14 +53,68 @@ class InfiniteScrollComponent extends Component
     }
 
     /**
-     * @param \Cake\Datasource\RepositoryInterface|\Cake\Datasource\QueryInterface $object The table or query to scroll.
-     * @param array $settings The settings/configuration used for infiniteScroll.
-     * @return \Cake\Datasource\ResultSetInterface Query results
-     * @throws \Cake\Http\Exception\NotFoundException
+     * Reference to the current controller.
+     *
+     * @var \Cake\Controller\Controller
      */
-    public function scroll($object, array $settings = [])
+    protected $_controller;
+
+    /**
+     * The table instance associated with the current controller.
+     *
+     * @var \Cake\ORM\Table
+     */
+    protected $_table;
+
+    /**
+     * Reference to the current request.
+     *
+     * @var \Cake\Http\ServerRequest
+     */
+    protected $_request;
+
+    public function __construct(ComponentRegistry $registry, array $config = [])
     {
-        $request = $this->_registry->getController()->getRequest();
+        $this->_controller = $registry->getController();
+
+        parent::__construct($registry, $config);
+    }
+
+    public function initialize(array $config)
+    {
+        parent::initialize($config);
+
+        $this->_request = $this->_controller->getRequest();
+    }
+
+    /**
+     * Handles infiniteScroll of records in Table objects.
+     *
+     * Will load the referenced Table object, and have the InfiniteScrollComponent scroll the query.
+     *
+     * @param \Cake\Datasource\RepositoryInterface|string|\Cake\Datasource\QueryInterface|null $object
+     *        The table or query to infiniteScroll
+     * (e.g: Table instance, 'TableName' or a Query object)
+     * @param array $settings The settings/configuration used for infiniteScroll.
+     * @return \Cake\ORM\ResultSet|\Cake\Datasource\ResultSetInterface Query results
+     * @throws \RuntimeException When no compatible table object can be found.
+     */
+    public function scroll($object = null, array $settings = [])
+    {
+        if (is_string($object) || $object === null) {
+            $try = [$object, $this->_controller->modelClass];
+            foreach ($try as $tableName) {
+                if (empty($tableName)) {
+                    continue;
+                }
+                $object = $this->_controller->loadModel($tableName);
+                break;
+            }
+        }
+
+        if (empty($object)) {
+            throw new \RuntimeException('Unable to locate an object compatible with infiniteScroll.');
+        }
 
         $query = null;
         if ($object instanceof QueryInterface) {
@@ -67,11 +122,11 @@ class InfiniteScrollComponent extends Component
             $object = $query->where()->getRepository();
         }
 
-        $params = $request->getQueryParams();
+        $queryParams = $this->_request->getQueryParams();
 
         $alias = $object->getAlias();
         $defaults = $this->getDefaults($alias, $settings);
-        $options = $this->mergeOptions($params, $defaults);
+        $options = $this->mergeOptions($queryParams, $defaults);
         $options = $this->validateSort($object, $options);
         $options = $this->checkLimit($options);
         $options = $this->filterByPosition($object, $query, $options);

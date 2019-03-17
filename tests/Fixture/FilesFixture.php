@@ -57,9 +57,9 @@ class FilesFixture extends TestFixture
                 'size' => 1,
                 'notes' => 'Lorem ipsum dolor sit amet, aliquet feugiat. Convallis morbi fringilla gravida, phasellus feugiat dapibus velit nunc, pulvinar eget sollicitudin venenatis cum nullam, vivamus ut a sed, mollitia lectus. Nulla vestibulum massa neque ut et, id hendrerit sit, feugiat in taciti enim proin nibh, tempor dignissim, rhoncus duis vestibulum nunc mattis convallis.',
                 'published' => 1,
-                'created_at' => 1544985713,
-                'modified_at' => 1544985713,
-                'deleted_at' => 1544985713
+                'created_at' => 1552755597,
+                'modified_at' => 1552755597,
+                'deleted_at' => 1552755597
             ],
         ];
         parent::init();

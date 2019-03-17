@@ -1,11 +1,27 @@
 <?php
 
 use Cake\Core\Configure;
+use Cake\ORM\TableRegistry;
 use Cake\Routing\RouteBuilder;
 use Cake\Routing\Router;
+use League\OAuth2\Server\Middleware\ResourceServerMiddleware;
+use League\OAuth2\Server\ResourceServer;
 
 Router::plugin('Skeleton', ['path' => '/'], function (RouteBuilder $routes) {
-    $routes->resources('Contacts', ['only' => ['create', 'update', 'delete']]);
+
+    // Register OAuth resource middleware
+    $accessTokens = TableRegistry::getTableLocator()->get('AccessTokens');
+    $publicKeyPath = CONFIG . 'oauth-public.key';
+    $resourceServer = new ResourceServer($accessTokens, $publicKeyPath);
+    $routes->registerMiddleware('resource', new ResourceServerMiddleware($resourceServer));
+
+    /**
+     * Apply a middleware to the current route scope.
+     * Requires middleware to be registered via `Application::routes()` with `registerMiddleware()`
+     */
+//    $routes->applyMiddleware('resource');
+
+    $routes->resources('Contacts', ['only' => ['index', 'create', 'update', 'delete']]);
 
     $routes->resources('Files', ['only' => ['index', 'create', 'delete']]);
 
@@ -38,4 +54,12 @@ Router::plugin('Skeleton', ['path' => '/'], function (RouteBuilder $routes) {
             '_method' => ['GET', 'POST']
         ]
     );
+});
+
+Router::scope('/oauth', ['controller' => 'OAuth'], function (RouteBuilder $routes) {
+    $routes->get('/', ['action' => 'oauth']);
+
+    $routes->get('/authorize', ['action' => 'authorize']);
+
+    $routes->post('/token', ['action' => 'accessToken']);
 });

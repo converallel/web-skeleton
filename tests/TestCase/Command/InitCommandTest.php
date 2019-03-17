@@ -1,12 +1,12 @@
 <?php
-namespace App\Test\TestCase\Command;
+namespace Skeleton\Test\TestCase\Command;
 
-use App\Command\InitCommand;
+use Skeleton\Command\InitCommand;
 use Cake\TestSuite\ConsoleIntegrationTestTrait;
 use Cake\TestSuite\TestCase;
 
 /**
- * App\Command\InitCommand Test Case
+ * Skeleton\Command\InitCommand Test Case
  */
 class InitCommandTest extends TestCase
 {
