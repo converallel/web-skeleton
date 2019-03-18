@@ -5,6 +5,7 @@ namespace Skeleton\Controller\Component;
 use Cake\Controller\Component;
 use Cake\Controller\ComponentRegistry;
 use Cake\Controller\Exception\MissingActionException;
+use Cake\Core\Configure;
 use Cake\Datasource\EntityInterface;
 use Cake\Datasource\ResultSetInterface;
 use Cake\Event\Event;
@@ -92,7 +93,7 @@ class CrudComponent extends Component
     public function __construct(ComponentRegistry $registry, array $config = [])
     {
         $this->_controller = $registry->getController();
-        $this->_table = $this->_controller->{$this->_controller->modelClass};
+        $this->_table = $this->_controller->{$this->_controller->getName()};
 
         parent::__construct($registry, $config);
     }
@@ -233,27 +234,32 @@ class CrudComponent extends Component
             $statusCode = $success ? 200 : 500;
             $message = $success ? $successMessage : $errorMessage;
 
+            // set the error message to be more descriptive when in debug mode
+            if ($entity->hasErrors() && Configure::read('debug')) {
+                $message = json_encode($entity->getErrors());
+            }
+
             if ($this->_serialized) {
-                switch ($action) {
-                    case 'index':
-                        $serializeData = $entity;
-                        break;
-                    case 'add':
-                        if ($this->_bulkAction) {
-                            $ids = array_map(function ($entity) {
-                                return ['id' => $entity->id];
-                            }, $entity);
-                            if (count($ids) === 1) {
-                                $ids = $ids[0];
-                            }
-                            $serializeData = $ids;
+                $serializeData = $message;
+                if ($success) {
+                    switch ($action) {
+                        case 'index':
+                            $serializeData = $entity;
                             break;
-                        }
-                        $serializeData = ['id' => $entity->id];
-                        break;
-                    default:
-                        $serializeData = $message;
-                        break;
+                        case 'add':
+                            if ($this->_bulkAction) {
+                                $ids = array_map(function ($entity) {
+                                    return ['id' => $entity->id];
+                                }, $entity);
+                                if (count($ids) === 1) {
+                                    $ids = $ids[0];
+                                }
+                                $serializeData = $ids;
+                                break;
+                            }
+                            $serializeData = ['id' => $entity->id];
+                            break;
+                    }
                 }
                 return $this->serialize($serializeData, $statusCode);
             }
@@ -296,7 +302,7 @@ class CrudComponent extends Component
             // get all visible fields
             $fields = [];
             if ($entity instanceof ResultSetInterface && $entity->count() > 0) {
-                 $fields = $entity->first()->visibleProperties();
+                $fields = $entity->first()->visibleProperties();
             } elseif ($entity instanceof EntityInterface) {
                 $fields = $entity->visibleProperties();
             }

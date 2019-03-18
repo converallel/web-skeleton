@@ -787,7 +787,7 @@ class Skeleton extends AbstractMigration
             ->addColumn('location_id', 'integer', [
                 'default' => null,
                 'limit' => 11,
-                'null' => false,
+                'null' => true,
                 'signed' => false,
             ])
             ->addColumn('profile_image_id', 'integer', [

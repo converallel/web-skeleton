@@ -3,6 +3,8 @@
 namespace Skeleton\Controller;
 
 use Cake\ORM\TableRegistry;
+use Cake\Validation\Validation;
+use http\Exception\InvalidArgumentException;
 
 /**
  * Users Controller
@@ -57,6 +59,31 @@ class UsersController extends AppController
 
     public function signUp()
     {
+        $data = $this->getRequest()->getData();
+
+        if ($email = $data['email'] ?? null) {
+            if (!Validation::email($email)) {
+                throw new InvalidArgumentException('Invalid email address.');
+            }
+            $data['contacts'][] = [
+                'user_id' => $this->currentUser->id,
+                'contact' => $email,
+                'type' => 'Email'
+            ];
+        }
+
+        if ($phoneNumber = $data['phone_number'] ?? null) {
+            if (!Validation::naturalNumber($phoneNumber)) {
+                throw new InvalidArgumentException('Invalid phone number.');
+            }
+            $data['contacts'][] = [
+                'user_id' => $this->currentUser->id,
+                'contact' => $phoneNumber,
+                'type' => 'Mobile'
+            ];
+        }
+
+        $this->setRequest($this->getRequest()->withParsedBody($data));
         $this->Crud->add([], ['template' => 'Common/add']);
     }
 }
