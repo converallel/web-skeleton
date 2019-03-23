@@ -15,6 +15,6 @@ class SearchHistoriesController extends AppController
     public function index()
     {
         $query = $this->SearchHistories->find()->orderDesc('searched_at')->limit(5);
-        $this->load($query);
+        $this->Crud->index($query);
     }
 }

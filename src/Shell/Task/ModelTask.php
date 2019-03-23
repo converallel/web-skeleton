@@ -46,7 +46,7 @@ class ModelTask extends \Bake\Shell\Task\ModelTask
             $displayField = $this->getThemeTableDisplayField($themeTableObject);
             $propertySchema = $this->getThemeEntityPropertySchema($themeTableObject);
             $fields = $this->getThemeTableFields($themeTableObject);
-            $validation = $this->getThemeTableValidation($themeTableObject);
+            $validation = $this->getThemeTableValidation($themeTableObject, $associations);
             $rulesChecker = $this->getThemeTableRules($themeTableObject, $associations);
             $behaviors = $themeTableObject->behaviors()->getIterator()->getArrayCopy();
             $connection = $this->connection;
@@ -216,6 +216,23 @@ class ModelTask extends \Bake\Shell\Task\ModelTask
         return array_values(array_diff($fields, $primaryKey));
     }
 
+    public function getHiddenFields($model)
+    {
+        if (!empty($this->params['no-hidden'])) {
+            return [];
+        }
+        if (!empty($this->params['hidden'])) {
+            $fields = explode(',', $this->params['hidden']);
+
+            return array_values(array_filter(array_map('trim', $fields)));
+        }
+        $schema = $model->getSchema();
+        $columns = $schema->columns();
+        $whitelist = ['token', 'password', 'passwd', 'deleted_at'];
+
+        return array_values(array_intersect($columns, $whitelist));
+    }
+
     public function getThemeTableHiddenFields(Table $model)
     {
         $entity = $this->getThemeEntity($model);
@@ -223,7 +240,7 @@ class ModelTask extends \Bake\Shell\Task\ModelTask
         return $entity->getHidden();
     }
 
-    public function getThemeTableValidation(Table $model)
+    public function getThemeTableValidation(Table $model, array $associations)
     {
         $schema = $model->getSchema();
         $primaryKey = $schema->primaryKey();

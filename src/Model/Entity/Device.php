@@ -33,4 +33,13 @@ class Device extends Entity
         'uuid' => true,
         'name' => true
     ];
+
+    /**
+     * Fields that are excluded from JSON versions of the entity.
+     *
+     * @var array
+     */
+    protected $_hidden = [
+        'deleted_at'
+    ];
 }

@@ -41,7 +41,7 @@ Router::plugin('Skeleton', ['path' => '/'], function (RouteBuilder $routes) {
 
     //    $routes->resources('Settings');
 
-    $routes->resources('Users', ['only' => ['view', 'create', 'update', 'delete']], function (RouteBuilder $routes) {
+    $routes->resources('Users', ['only' => ['view', 'update', 'delete']], function (RouteBuilder $routes) {
         $routes->resources('Locations', ['only' => ['update']]);
         $routes->resources('Files', ['only' => ['index']]);
     });

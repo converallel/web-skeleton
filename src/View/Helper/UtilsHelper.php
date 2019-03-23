@@ -2,6 +2,7 @@
 
 namespace Skeleton\View\Helper;
 
+use Cake\ORM\TableRegistry;
 use Cake\View\Helper;
 
 /**
@@ -30,7 +31,8 @@ class UtilsHelper extends Helper
         } elseif (is_bool($value)) {
             $value = $value ? __('Yes') : __('No');
         } elseif ($value instanceof \Cake\Datasource\EntityInterface) {
-            $value = $this->Html->link($value->id,
+            $table = TableRegistry::getTableLocator()->get($value->getSource());
+            $value = $this->Html->link($value->{$table->getDisplayField()},
                 ['controller' => $value->getSource(), 'action' => 'view', $value->id]);
         } else {
             $value = h($value);

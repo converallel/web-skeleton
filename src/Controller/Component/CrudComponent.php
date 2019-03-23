@@ -5,6 +5,7 @@ namespace Skeleton\Controller\Component;
 use Cake\Controller\Component;
 use Cake\Controller\ComponentRegistry;
 use Cake\Controller\Exception\MissingActionException;
+use Cake\Core\App;
 use Cake\Core\Configure;
 use Cake\Datasource\EntityInterface;
 use Cake\Datasource\ResultSetInterface;
@@ -15,7 +16,6 @@ use Cake\Http\Exception\NotFoundException;
 use Cake\Http\Response;
 use Cake\ORM\Association;
 use Cake\ORM\Query;
-use Cake\ORM\ResultSet;
 use Cake\Utility\Hash;
 use Cake\Utility\Inflector;
 
@@ -176,13 +176,29 @@ class CrudComponent extends Component
     }
 
     /**
-     *
-     * @param array|Query|EntityInterface|ResultSetInterface|ResultSet|null $query
-     * @param array $options options accepted by `Crud::load()`
+     * @param array|Query|EntityInterface|ResultSetInterface|null $query
+     * @param array $options Options accepted by `Crud::load()`
      */
     public function delete($query = [], array $options = [])
     {
         $this->load($query, ['action' => 'delete'] + $options);
+    }
+
+    /**
+     * @param array|\Cake\Database\Expression\QueryExpression|callable|string $fields
+     * @param array $conditions
+     */
+    public function updateAll($fields, array $conditions)
+    {
+
+    }
+
+    /**
+     * @param array $conditions
+     */
+    public function deleteAll(array $conditions)
+    {
+
     }
 
     /**
@@ -194,6 +210,7 @@ class CrudComponent extends Component
      * - `allowMethods` - The HTTP methods allowed for the current action.
      * - `updateMethods` - The HTTP methods that will carry out an update action in the database.
      *    Usually one of (post, patch, put, delete)
+     * - `ormMethodOptions` - Options used when calling Table::save() or Table::delete() for each entity.
      * - `successMessage`
      * - `errorMessage`
      * - `pagination` - Settings for pagination.
@@ -204,7 +221,7 @@ class CrudComponent extends Component
      *    e.g. 'Articles/index', or the template name, e.g. 'index'. If only a template name is specified, this method will
      *    look for this template file in the template folder corresponding to the current controller.
      *
-     * @param array|Query|EntityInterface|ResultSetInterface|ResultSet|null $query
+     * @param array|Query|EntityInterface|ResultSetInterface|null $query
      * @param array $options
      * @return \Cake\Http\Response|null
      */
@@ -218,18 +235,25 @@ class CrudComponent extends Component
         $action = $options['action'] ?? $this->_action;
         $allowMethods = $options['allowMethods'];
         $updateMethods = $options['updateMethods'];
-        $method = $options['method'];
+        $ormMethod = $options['ormMethod'];
+        $ormMethodOptions = $options['ormMethodOptions'] ?? [];
         $successMessage = $options['successMessage'];
         $errorMessage = $options['errorMessage'];
-        $viewVars = $options['viewVars'] ?? [];
-        $template = $options['template'] ?? '';
 
         if (!empty($allowedMethods)) {
             $this->_request->allowMethod($allowMethods);
         }
 
         if ($this->_request->is($updateMethods)) {
-            $success = $this->_table->{$method}($entity);
+            if ($this->_bulkAction && $ormMethod === 'delete') {
+                $success = $this->_table->getConnection()->transactional(function () use ($entity, $ormMethodOptions) {
+                    foreach ($entity as $item) {
+                        $this->_table->save($item, $ormMethodOptions);
+                    }
+                });
+            } else {
+                $success = $this->_table->{$ormMethod}($entity, $ormMethodOptions);
+            }
             $flashMethod = $success ? 'success' : 'error';
             $statusCode = $success ? 200 : 500;
             $message = $success ? $successMessage : $errorMessage;
@@ -271,69 +295,7 @@ class CrudComponent extends Component
             }
         }
 
-        if ($this->_serialized) {
-            return $this->serialize($entity);
-        }
-
-        if ($template) {
-            $components = explode(DS, $template);
-            if (count($components) > 1) {
-                $template = array_pop($components);
-                $this->_controller->viewBuilder()->setTemplatePath(implode(DS, $components));
-            }
-            $this->_controller->viewBuilder()->setTemplate($template);
-        } elseif (
-            file_exists(APP . 'Template' . DS . 'Common' . DS . Inflector::underscore($this->_action) . '.ctp') &&
-            !file_exists(APP . 'Template' . DS . $this->_viewPath() . DS . Inflector::underscore($this->_action) . '.ctp')) {
-            $this->_controller->viewBuilder()->setTemplatePath('Common');
-        }
-
-        if ($action !== 'delete') {
-            $usingCommonTemplate = $this->_controller->viewBuilder()->getTemplatePath() === 'Common';
-            $entityName = $usingCommonTemplate ? 'entity' : $this->_entityName;
-            $entitiesName = $usingCommonTemplate ? 'entities' : lcfirst($this->_table->getAlias());
-            $name = $entity instanceof \Countable ? $entitiesName : $entityName;
-            $associations = array_values(array_map(function (Association $association) {
-                return $association->getName();
-            }, $this->_table->associations()->getIterator()->getArrayCopy()));
-            $className = $this->_controller->getName();
-            $displayField = $this->_table->getDisplayField();
-
-            // get all visible fields
-            $fields = [];
-            if ($entity instanceof ResultSetInterface && $entity->count() > 0) {
-                $fields = $entity->first()->visibleProperties();
-            } elseif ($entity instanceof EntityInterface) {
-                $fields = $entity->visibleProperties();
-            }
-
-            // sanitize fields, remove 'XXX_id' where 'XXX' is in the fields
-            $fields = array_filter($fields, function ($field) use ($fields) {
-                $components = explode('_', $field);
-                if (count($components) > 1) {
-                    $last = array_pop($components);
-                    $first = implode('_', $components);
-                    return $last !== 'id' || !in_array($first, $fields);
-                }
-                return true;
-            });
-
-            // set $accessibleFields if action requires user input
-            if (in_array($action, ['add', 'edit'])) {
-                $entityFields = array_merge($this->_table->getSchema()->columns(), array_map(function ($association) {
-                    return Inflector::underscore($association);
-                }, $associations));
-                $accessibleFields = array_filter(array_merge($entityFields), function ($field) use ($entity) {
-                    return $entity->isAccessible($field);
-                });
-                $this->_controller->set(compact('accessibleFields'));
-            }
-
-            // set the view variables
-            $this->_controller->set($name, $entity);
-            $this->_controller->set(compact('associations', 'className', 'displayField', 'fields'));
-            $this->setExtraViews($viewVars);
-        }
+        $this->setView($entity);
     }
 
     /**
@@ -361,6 +323,7 @@ class CrudComponent extends Component
             'action',
             'allowMethods',
             'updateMethods',
+            'ormMethodOptions',
             'successMessage',
             'errorMessage',
             'pagination',
@@ -388,13 +351,13 @@ class CrudComponent extends Component
      * Get entity/entities used for the current action.
      * If query is empty, returns the default entity/entities for the current action.
      *
-     * @param array|Query|EntityInterface|ResultSetInterface|ResultSet|null $query
+     * @param array|Query|EntityInterface|ResultSetInterface|null $query
      * @param array $options
-     * @return EntityInterface|ResultSetInterface|ResultSet|null
+     * @return EntityInterface|ResultSetInterface|null
      */
     protected function _getEntity($query = [], $options = [])
     {
-        if ($query instanceof EntityInterface || $query instanceof ResultSetInterface || $query instanceof ResultSet) {
+        if ($query instanceof EntityInterface || $query instanceof ResultSetInterface) {
             return $query;
         }
 
@@ -489,6 +452,7 @@ class CrudComponent extends Component
      */
     protected function _setBulkAction()
     {
+        $this->_request = $this->_controller->getRequest();
         $requestData = $this->_request->getData();
 
         if (!is_array($requestData) || !is_assoc($requestData)) {
@@ -513,7 +477,7 @@ class CrudComponent extends Component
     protected function _getActionConfig($options)
     {
         $config = [
-            'method' => 'save',
+            'ormMethod' => $this->_bulkAction ? 'saveMany' : 'save',
             'successMessage' => 'Success!',
             'errorMessage' => 'Request failed. Please, try again.',
             'allowMethods' => [],
@@ -525,29 +489,22 @@ class CrudComponent extends Component
         $entity = null;
         switch ($action) {
             case 'index':
-                $override = [];
                 break;
             case 'view':
                 break;
             case 'add':
-                if ($this->_bulkAction) {
-                    $override['method'] = 'saveMany';
-                }
                 $override['updateMethods'] = ['post'];
                 break;
             case 'edit':
                 $override = [
                     'updateMethods' => ['patch', 'post', 'put'],
                 ];
-                if ($this->_bulkAction) {
-                    $override['method'] = 'updateAll';
-                }
                 break;
             case 'delete':
                 $override = [
                     'allowMethods' => ['post', 'delete'],
                     'updateMethods' => ['post', 'delete'],
-                    'method' => $this->_bulkAction ? 'deleteAll' : 'delete'
+                    'ormMethod' => 'delete'
                 ];
                 break;
         }
@@ -574,7 +531,7 @@ class CrudComponent extends Component
 
     /**
      * Serializes the response body, i.e. json/xml
-     * @param array|int|string|EntityInterface|ResultSetInterface $data
+     * @param array|string|EntityInterface|ResultSetInterface $data
      * @param int $status
      */
     public function serialize($data = [], $status = 200)
@@ -592,6 +549,85 @@ class CrudComponent extends Component
 
         $this->_controller->setResponse($this->_controller->getResponse()->withStatus($status));
         $this->_controller->set(array_merge($data, ['_serialize' => array_keys($data)]));
+    }
+
+    /**
+     * @param array|int|string|EntityInterface|ResultSetInterface $data
+     * @param array $options
+     */
+    public function setView($data = [], $options = [])
+    {
+        if ($this->_serialized) {
+            return $this->serialize($data);
+        }
+
+        $action = $options['action'] ?? $this->_action;
+        $viewVars = $options['viewVars'] ?? [];
+        $template = $options['template'] ?? '';
+
+        // set template
+        $templateName = Inflector::underscore($this->_action) . '.ctp';
+        if ($template) {
+            $components = explode(DS, $template);
+            if (count($components) > 1) {
+                $template = array_pop($components);
+                $this->_controller->viewBuilder()->setTemplatePath(implode(DS, $components));
+            }
+            $this->_controller->viewBuilder()->setTemplate($template);
+        } elseif (!file_exists(App::path('Template/' . $this->_viewPath())[0] . $templateName)
+            && file_exists(App::path('Template/Common')[0] . $templateName)) {
+            $this->_controller->viewBuilder()->setTemplatePath('Common');
+        }
+
+        // set view variables
+        $usingCommonTemplate = $this->_controller->viewBuilder()->getTemplatePath() === 'Common';
+        $entityName = $usingCommonTemplate ? 'entity' : $this->_entityName;
+        $entitiesName = $usingCommonTemplate ? 'entities' : lcfirst($this->_table->getAlias());
+        $name = $data instanceof \Countable ? $entitiesName : $entityName;
+        $associations = array_values(array_map(function (Association $association) {
+            return $association->getName();
+        }, $this->_table->associations()->getIterator()->getArrayCopy()));
+        $className = $this->_controller->getName();
+        $displayField = $this->_table->getDisplayField();
+
+        // get all visible fields
+        $entity = $data;
+        if ($entity instanceof ResultSetInterface && $entity->count() > 0) {
+            $fields = $entity->first()->visibleProperties();
+        } elseif ($entity instanceof EntityInterface) {
+            $fields = $entity->visibleProperties();
+        } else {
+            $entity = $this->_table->newEntity();
+            $fields = array_diff_improved(array_merge($this->_table->getSchema()->columns(), $entity->getVirtual()),
+                $entity->getHidden());
+        }
+
+        // sanitize fields, remove 'XXX_id' where 'XXX' is in the fields
+        $fields = array_filter($fields, function ($field) use ($fields) {
+            $components = explode('_', $field);
+            if (count($components) > 1) {
+                $last = array_pop($components);
+                $first = implode('_', $components);
+                return $last !== 'id' || !in_array($first, $fields);
+            }
+            return true;
+        });
+
+        // set $accessibleFields if action requires user input
+        if (in_array($action, ['add', 'edit'])) {
+            $entityFields = array_merge($this->_table->getSchema()->columns(), array_map(function ($association) {
+                return Inflector::underscore($association);
+            }, $associations));
+            $accessibleFields = array_filter($entityFields, function ($field) use ($entity) {
+                return $entity->isAccessible($field);
+            });
+            $this->_controller->set(compact('accessibleFields'));
+        }
+
+        // set the view variables
+        $this->_controller->set($name, $data);
+        $this->_controller->set(compact('associations', 'className', 'displayField', 'fields'));
+        $this->setExtraViews($viewVars);
     }
 
     /**

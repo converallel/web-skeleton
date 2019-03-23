@@ -23,11 +23,6 @@ class ContactsController extends AppController
         foreach ($query as $contact) {
             $result[strtolower($contact->type)] = json_decode($contact->contacts, true);
         }
-        if ($this->usingApi) {
-            return $this->serialize($result);
-        }
-        foreach ($result as $type => $contact) {
-            $this->set($type, $contact);
-        }
+        $this->Crud->setView($result);
     }
 }
